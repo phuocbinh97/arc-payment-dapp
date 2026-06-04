@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mộc — Cửa hàng thủ công mỹ nghệ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #faf8f4;
+      --panel:     #ffffff;
+      --ink:       #1c1410;
+      --muted:     #8a7968;
+      --line:      #e8e0d4;
+      --accent:    #c45c2a;
+      --accent-lt: #f5ede6;
+      --green:     #3a6b45;
+      --shadow:    0 20px 56px rgba(28,20,16,.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(250,248,244,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      width: min(1200px, 100% - 48px);
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .logo em {
+      color: var(--accent);
+      font-style: normal;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 150ms;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    .cart-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--ink);
+      color: white;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: opacity 150ms;
+    }
+    .cart-pill:hover { opacity: .85; }
+    .cart-count {
+      display: grid;
+      place-items: center;
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      width: min(1200px, 100% - 48px);
+      margin: 0 auto;
+      padding: 72px 0 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 5vw, 68px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 18px;
+    }
+    .hero-text h1 em {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .hero-text p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      max-width: 420px;
+      margin-bottom: 28px;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: white;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: background 150ms;
+    }
+    .hero-cta:hover { background: #a84d22; }
+
+    .hero-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .hero-card {
+      border-radius: 10px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0e8df, #e8ddd2);
+      aspect-ratio: 4/5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+    }
+    .hero-card:first-child {
+      grid-row: span 2;
+      aspect-ratio: auto;
+    }
+
+    /* ── CATEGORIES ── */
+    .categories {
+      width: min(1200px, 100% - 48px);
+      margin: 0 auto 56px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .cat-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 150ms;
+    }
+    .cat-btn:hover,
+    .cat-btn.active {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+
+    /* ── PRODUCTS ── */
+    .products-section {
+      width: min(1200px, 100% - 48px);
+      margin: 0 auto;
+      padding-bottom: 80px;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .section-header a {
+      color: var(--accent);
+      font-size: 14px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: var(--panel);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      box-shadow: 0 2px 16px rgba(28,20,16,.06);
+      transition: box-shadow 200ms, transform 200ms;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+    }
+
+    .product-img {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #f0ebe4, #e8e0d5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      position: relative;
+    }
+    .product-tag {
+      position: absolute;
+      top: 10px; left: 10px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .product-tag.new { background: var(--accent); color: white; }
+    .product-tag.sale { background: var(--green); color: white; }
+
+    .product-info {
+      padding: 14px 16px 16px;
+    }
+    .product-cat {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 5px;
+    }
+    .product-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      line-height: 1.3;
+    }
+    .product-desc {
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .product-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .product-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .product-price small {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* ── BUY BUTTON — chỗ bạn sẽ nhúng logic checkout ── */
+    .btn-buy {
+      padding: 8px 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 150ms;
+    }
+    .btn-buy:hover { background: #a84d22; }
+
+    /* ── CART DRAWER ── */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(28,20,16,.5);
+      z-index: 200;
+    }
+    .drawer-overlay.open { display: block; }
+
+    .drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: min(420px, 100vw);
+      background: var(--panel);
+      box-shadow: -20px 0 60px rgba(28,20,16,.15);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 280ms cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-head h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+    }
+    .close-drawer {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 22px;
+    }
+    .empty-cart {
+      text-align: center;
+      padding: 48px 0;
+      color: var(--muted);
+    }
+    .empty-cart .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .cart-item {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .cart-item-img {
+      width: 60px; height: 60px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f0ebe4, #e8e0d5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .cart-item-info { flex: 1; }
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+    .cart-item-price {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .cart-item-remove {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      align-self: flex-start;
+    }
+
+    .drawer-foot {
+      padding: 20px 22px;
+      border-top: 1px solid var(--line);
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .total-label { color: var(--muted); font-size: 14px; }
+    .total-amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .total-amount small {
+      font-size: 14px;
+      color: var(--muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 400;
+    }
+
+    /* ── NÚT CHECKOUT — bạn sẽ sửa onclick ở đây ── */
+    #checkoutBtn {
+      width: 100%;
+      padding: 14px;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 150ms;
+    }
+    #checkoutBtn:hover { opacity: .85; }
+    #checkoutBtn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">Mộc<em>.</em></a>
+    <ul class="nav-links">
+      <li><a href="#">Cửa hàng</a></li>
+      <li><a href="#">Bộ sưu tập</a></li>
+      <li><a href="#">Về chúng tôi</a></li>
+    </ul>
+    <button class="cart-pill" onclick="openDrawer()">
+      🛒 Giỏ hàng
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section>
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Thủ công<br><em>tinh tế</em><br>từ thiên nhiên</h1>
+      <p>Những sản phẩm thủ công mỹ nghệ được làm tay từ gỗ và mây tre, mang hơi thở thiên nhiên vào không gian sống của bạn.</p>
+      <a class="hero-cta" href="#products">Khám phá ngay →</a>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">🪵</div>
+      <div class="hero-card">🧺</div>
+      <div class="hero-card">🪴</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CATEGORIES ── -->
+<div class="categories">
+  <button class="cat-btn active" onclick="filterCat(this,'all')">Tất cả</button>
+  <button class="cat-btn" onclick="filterCat(this,'Đồ gỗ')">Đồ gỗ</button>
+  <button class="cat-btn" onclick="filterCat(this,'Mây tre')">Mây tre</button>
+  <button class="cat-btn" onclick="filterCat(this,'Gốm sứ')">Gốm sứ</button>
+  <button class="cat-btn" onclick="filterCat(this,'Trang trí')">Trang trí</button>
+</div>
+
+<!-- ── PRODUCTS ── -->
+<section class="products-section" id="products">
+  <div class="section-header">
+    <h2>Sản phẩm</h2>
+    <a href="#">Xem tất cả →</a>
+  </div>
+  <div class="product-grid" id="productGrid"></div>
+</section>
+
+<footer>
+  <div>© 2026 Mộc · Thủ công mỹ nghệ Việt Nam</div>
+</footer>
+
+<!-- ── CART DRAWER ── -->
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>Giỏ hàng</h3>
+    <button class="close-drawer" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+    <div class="empty-cart">
+      <div class="icon">🛒</div>
+      <p>Giỏ hàng trống</p>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <div class="total-row">
+      <span class="total-label">Tổng cộng</span>
+      <span class="total-amount" id="totalAmount">0.00 <small>USDC</small></span>
+    </div>
+
+    <!-- ============================================================
+         NÚT CHECKOUT
+         Bạn sẽ sửa onclick="handleCheckout()" để nhúng Arc Checkout
+         ============================================================ -->
+    <button id="checkoutBtn" disabled onclick="handleCheckout()">
+      Thanh toán
+    </button>
+
+  </div>
+</div>
+
+<script>
+  // ── Danh sách sản phẩm ──────────────────────────────────────────
+  const products = [
+    { id:'w1', cat:'Đồ gỗ',   emoji:'🪵', tag:'new',  name:'Khay gỗ walnut',      desc:'Khay đựng đồ bằng gỗ óc chó nguyên khối, hoàn thiện dầu tự nhiên.',    price: 4.50 },
+    { id:'w2', cat:'Đồ gỗ',   emoji:'🍽️', tag:'',     name:'Bát gỗ teak',         desc:'Bát ăn gỗ teak nhập khẩu, an toàn thực phẩm, bền đẹp theo thời gian.',  price: 3.00 },
+    { id:'b1', cat:'Mây tre', emoji:'🧺', tag:'sale', name:'Giỏ đan tay',          desc:'Giỏ mây đan thủ công, hoa văn truyền thống, nhiều kích thước.',           price: 2.50 },
+    { id:'b2', cat:'Mây tre', emoji:'🪣', tag:'',     name:'Thùng lưu trữ',        desc:'Thùng tre tổng hợp, có nắp đậy, lý tưởng để đựng đồ phòng khách.',       price: 5.00 },
+    { id:'c1', cat:'Gốm sứ',  emoji:'🏺', tag:'new',  name:'Bình gốm thủ công',   desc:'Bình hoa gốm men tro tự nhiên, nung truyền thống tại Bát Tràng.',         price: 3.50 },
+    { id:'c2', cat:'Gốm sứ',  emoji:'☕', tag:'',     name:'Bộ tách trà gốm',     desc:'Bộ 4 tách trà, men xanh ngọc, phù hợp pha trà và cà phê.',               price: 4.00 },
+    { id:'d1', cat:'Trang trí',emoji:'🪔', tag:'',    name:'Đèn nến gỗ',           desc:'Chân đèn gỗ tạo hình thủ công, tạo không khí ấm cúng cho phòng.',        price: 2.00 },
+    { id:'d2', cat:'Trang trí',emoji:'🌿', tag:'new', name:'Khung tranh tre',      desc:'Khung tranh tre tự nhiên, khắc hoa văn, kích thước A4.',                  price: 1.50 },
+  ];
+
+  // ── Cart state ───────────────────────────────────────────────────
+  let cart = [];
+
+  function getTotal() {
+    return cart.reduce((s, i) => s + i.price, 0);
+  }
+
+  function addToCart(productId) {
+    const p = products.find(x => x.id === productId);
+    if (!p) return;
+    cart.push({ ...p, uid: Date.now() });
+    updateCart();
+    openDrawer();
+  }
+
+  function removeFromCart(uid) {
+    cart = cart.filter(i => i.uid !== uid);
+    updateCart();
+  }
+
+  function updateCart() {
+    // count badge
+    document.getElementById('cartCount').textContent = cart.length;
+
+    // total
+    document.getElementById('totalAmount').innerHTML =
+      `${getTotal().toFixed(2)} <small>USDC</small>`;
+
+    // checkout button
+    document.getElementById('checkoutBtn').disabled = cart.length === 0;
+
+    // drawer body
+    const body = document.getElementById('drawerBody');
+    if (cart.length === 0) {
+      body.innerHTML = `
+        <div class="empty-cart">
+          <div class="icon">🛒</div>
+          <p>Giỏ hàng trống</p>
+        </div>`;
+      return;
+    }
+    body.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-img">${item.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">${item.price.toFixed(2)} USDC</div>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCart(${item.uid})">×</button>
+      </div>
+    `).join('');
+  }
+
+  // ── Drawer ───────────────────────────────────────────────────────
+  function openDrawer() {
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('drawer').classList.remove('open');
+  }
+
+  // ── Filter category ──────────────────────────────────────────────
+  function filterCat(btn, cat) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts(cat === 'all' ? null : cat);
+  }
+
+  // ── Render products ──────────────────────────────────────────────
+  function renderProducts(filterCat) {
+    const list = filterCat ? products.filter(p => p.cat === filterCat) : products;
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = list.map(p => `
+      <div class="product-card">
+        <div class="product-img">
+          ${p.emoji}
+          ${p.tag ? `<span class="product-tag ${p.tag}">${p.tag === 'new' ? 'Mới' : 'Sale'}</span>` : ''}
+        </div>
+        <div class="product-info">
+          <div class="product-cat">${p.cat}</div>
+          <div class="product-name">${p.name}</div>
+          <p class="product-desc">${p.desc}</p>
+          <div class="product-bottom">
+            <div class="product-price">${p.price.toFixed(2)} <small>USDC</small></div>
+            <button class="btn-buy" onclick="addToCart('${p.id}')">Thêm vào giỏ</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── CHECKOUT HANDLER ─────────────────────────────────────────────
+  // Đây là hàm bạn sẽ sửa để nhúng Arc Checkout vào
+function handleCheckout() {
+  if (cart.length === 0) return;
+
+  const total   = getTotal().toFixed(2);
+  const orderId = 'moc-' + Date.now();
+  const memo    = cart.map(i => i.name).join(', ');
+
+  const url = new URL('./arc-usdc-checkout.html', window.location.href);
+  url.searchParams.set('amount',     total);
+  url.searchParams.set('order',      orderId);
+  url.searchParams.set('memo',       memo);
+  url.searchParams.set('merchant',   '0x5e86FCe1b94772Ff6a9632FA8BEc82BA59e24f02');
+  url.searchParams.set('merchantId', 'moc-shop');
+  url.searchParams.set('contract',   '0xc7cb4f5ace70a4febc3b260591832af72563e988');
+  url.searchParams.set('mode',       'hub');
+
+  window.location.href = url.toString();
+}
+
+  // ── Init ─────────────────────────────────────────────────────────
+  renderProducts();
+</script>
+</body>
+</html>

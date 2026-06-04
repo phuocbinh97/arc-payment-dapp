@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deploy Arc Checkout</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0757f9;
+      --accent-dark: #0647c9;
+      --ok: #087443;
+      --bad: #b42318;
+      --shadow: 0 18px 50px rgba(23, 32, 51, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, rgba(7, 87, 249, 0.08), transparent 42%), var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    main {
+      width: min(900px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 40px);
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid #cbd3df;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      padding: 12px 13px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(7, 87, 249, 0.16);
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0 15px;
+      background: var(--accent);
+      color: white;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    button:hover { background: var(--accent-dark); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .secondary {
+      background: white;
+      color: var(--ink);
+      border-color: #cbd3df;
+    }
+
+    .secondary:hover { background: #f8fafc; }
+
+    .status {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result,
+    .error {
+      display: none;
+      margin-top: 16px;
+      border-radius: 7px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .result {
+      border: 1px solid #abefc6;
+      background: #ecfdf3;
+      color: var(--ok);
+    }
+
+    .error {
+      border: 1px solid #fecdca;
+      background: #fef3f2;
+      color: var(--bad);
+    }
+
+    a { color: inherit; font-weight: 800; }
+
+    @media (max-width: 720px) {
+      header,
+      .grid {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Deploy Arc Checkout</h1>
+        <p class="subtitle">Deploy your own contract on Arc Testnet. You only confirm in MetaMask.</p>
+      </div>
+      <button id="connectBtn" type="button">Connect wallet</button>
+    </header>
+
+    <section class="panel">
+      <div class="status" id="status">Wallet not connected</div>
+
+      <div class="grid">
+        <div>
+          <label for="merchant">Merchant wallet</label>
+          <input id="merchant" autocomplete="off" placeholder="0x...">
+        </div>
+        <div>
+          <label for="usdc">USDC contract</label>
+          <input id="usdc" autocomplete="off" value="0x3600000000000000000000000000000000000000">
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label for="merchantId">Merchant ID</label>
+          <input id="merchantId" autocomplete="off" value="bcth-arc-checkout">
+        </div>
+        <div>
+          <label for="projectSlug">Project slug</label>
+          <input id="projectSlug" autocomplete="off" value="bcth-usdc-checkout-arc">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="deployBtn" type="button">Deploy contract</button>
+        <button class="secondary" id="switchBtn" type="button">Switch Arc Testnet</button>
+        <a class="secondary" href="./arc-usdc-checkout.html" style="display:inline-flex;align-items:center;min-height:42px;border:1px solid #cbd3df;border-radius:6px;padding:0 15px;text-decoration:none;">Open checkout</a>
+      </div>
+
+      <div class="result" id="result"></div>
+      <div class="error" id="error"></div>
+    </section>
+  </main>
+
+  <script>
+    const ARC_CHAIN_ID_HEX = "0x4cef52";
+    const ARC_RPC = "https://rpc.testnet.arc.network";
+    const ARC_EXPLORER = "https://testnet.arcscan.app";
+
+    const els = {
+      connectBtn: document.querySelector("#connectBtn"),
+      switchBtn: document.querySelector("#switchBtn"),
+      deployBtn: document.querySelector("#deployBtn"),
+      status: document.querySelector("#status"),
+      merchant: document.querySelector("#merchant"),
+      usdc: document.querySelector("#usdc"),
+      merchantId: document.querySelector("#merchantId"),
+      projectSlug: document.querySelector("#projectSlug"),
+      result: document.querySelector("#result"),
+      error: document.querySelector("#error")
+    };
+
+    let account = "";
+    let chainId = "";
+
+    function shortAddress(address) {
+      return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
+    }
+
+    function isValidAddress(address) {
+      return /^0x[a-fA-F0-9]{40}$/.test(address);
+    }
+
+    function setError(message) {
+      els.error.style.display = message ? "block" : "none";
+      els.error.textContent = message || "";
+    }
+
+    function setResult(html) {
+      els.result.style.display = html ? "block" : "none";
+      els.result.innerHTML = html || "";
+    }
+
+    function updateStatus() {
+      const network = chainId.toLowerCase() === ARC_CHAIN_ID_HEX ? "Arc Testnet" : (chainId || "Unknown chain");
+      els.status.textContent = account ? `Connected: ${shortAddress(account)} on ${network}` : "Wallet not connected";
+      els.connectBtn.textContent = account ? shortAddress(account) : "Connect wallet";
+      if (!els.merchant.value && account) {
+        els.merchant.value = account;
+      }
+    }
+
+    function requireWallet() {
+      if (!window.ethereum) {
+        throw new Error("No injected wallet found. Open this page in Chrome with MetaMask or Rabby enabled.");
+      }
+      return window.ethereum;
+    }
+
+    async function refreshWalletState() {
+      const provider = requireWallet();
+      const accounts = await provider.request({ method: "eth_accounts" });
+      account = accounts[0] || "";
+      chainId = await provider.request({ method: "eth_chainId" });
+      updateStatus();
+    }
+
+    async function connectWallet() {
+      setError("");
+      const provider = requireWallet();
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      account = accounts[0] || "";
+      chainId = await provider.request({ method: "eth_chainId" });
+      updateStatus();
+    }
+
+    async function switchToArc() {
+      setError("");
+      const provider = requireWallet();
+      try {
+        await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_CHAIN_ID_HEX }] });
+      } catch (error) {
+        if (error.code !== 4902) throw error;
+        await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: ARC_CHAIN_ID_HEX,
+            chainName: "Arc Network Testnet",
+            nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
+            rpcUrls: [ARC_RPC],
+            blockExplorerUrls: [ARC_EXPLORER]
+          }]
+        });
+      }
+      await refreshWalletState();
+    }
+
+    function utf8ToHex(value) {
+      return Array.from(new TextEncoder().encode(value))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function encodeUint(value) {
+      return BigInt(value).toString(16).padStart(64, "0");
+    }
+
+    function encodeAddress(address) {
+      return address.toLowerCase().replace("0x", "").padStart(64, "0");
+    }
+
+    function encodeDynamicString(value) {
+      const hex = utf8ToHex(value);
+      const byteLength = hex.length / 2;
+      const paddedLength = Math.ceil(hex.length / 64) * 64;
+      return encodeUint(byteLength) + hex.padEnd(paddedLength, "0");
+    }
+
+    function encodeConstructor(merchant, usdc, merchantId, projectSlug) {
+      const headSize = 32n * 4n;
+      const merchantIdData = encodeDynamicString(merchantId);
+      const projectSlugData = encodeDynamicString(projectSlug);
+      const merchantIdOffset = headSize;
+      const projectSlugOffset = headSize + BigInt(merchantIdData.length / 2);
+      return (
+        encodeAddress(merchant) +
+        encodeAddress(usdc) +
+        encodeUint(merchantIdOffset) +
+        encodeUint(projectSlugOffset) +
+        merchantIdData +
+        projectSlugData
+      );
+    }
+
+    async function waitForReceipt(txHash) {
+      const provider = requireWallet();
+      for (let i = 0; i < 80; i += 1) {
+        const receipt = await provider.request({ method: "eth_getTransactionReceipt", params: [txHash] });
+        if (receipt) return receipt;
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+      }
+      throw new Error("Transaction submitted, but receipt was not available yet. Check ArcScan with the tx hash.");
+    }
+
+    async function deploy() {
+      setError("");
+      setResult("");
+      try {
+        const provider = requireWallet();
+        if (!account) await connectWallet();
+        if (chainId.toLowerCase() !== ARC_CHAIN_ID_HEX) await switchToArc();
+
+        const merchant = els.merchant.value.trim();
+        const usdc = els.usdc.value.trim();
+        const merchantId = els.merchantId.value.trim();
+        const projectSlug = els.projectSlug.value.trim();
+        if (!isValidAddress(merchant)) throw new Error("Merchant wallet must be a valid EVM address.");
+        if (!isValidAddress(usdc)) throw new Error("USDC contract must be a valid EVM address.");
+        if (!merchantId) throw new Error("Merchant ID is required.");
+        if (!projectSlug) throw new Error("Project slug is required.");
+
+        els.deployBtn.disabled = true;
+        els.deployBtn.textContent = "Confirm deploy";
+
+        const artifact = await fetch("./ArcCheckout.artifact.json").then((response) => response.json());
+        const data = artifact.bytecode + encodeConstructor(merchant, usdc, merchantId, projectSlug);
+        const txHash = await provider.request({
+          method: "eth_sendTransaction",
+          params: [{
+            from: account,
+            data,
+            maxFeePerGas: "0x4a817c800",
+            maxPriorityFeePerGas: "0x0"
+          }]
+        });
+
+        els.deployBtn.textContent = "Waiting receipt";
+        setResult(`Deploy submitted. <a href="${ARC_EXPLORER}/tx/${txHash}" target="_blank" rel="noreferrer">View tx</a>`);
+        const receipt = await waitForReceipt(txHash);
+        if (receipt.status !== "0x1") throw new Error("Deploy transaction reverted.");
+
+        localStorage.setItem("arcCheckoutContract", receipt.contractAddress);
+        localStorage.setItem("arcCheckoutMerchant", merchant);
+        setResult(`
+          Contract deployed: <strong>${receipt.contractAddress}</strong><br>
+          Saved locally for the checkout app.<br>
+          <a href="${ARC_EXPLORER}/address/${receipt.contractAddress}" target="_blank" rel="noreferrer">View contract</a>
+          &nbsp;|&nbsp;
+          <a href="./arc-usdc-checkout.html?admin=1">Open invoice builder</a>
+        `);
+      } catch (error) {
+        setError(error.message || "Deploy failed.");
+      } finally {
+        els.deployBtn.disabled = false;
+        els.deployBtn.textContent = "Deploy contract";
+      }
+    }
+
+    els.connectBtn.addEventListener("click", () => connectWallet().catch((error) => setError(error.message)));
+    els.switchBtn.addEventListener("click", () => switchToArc().catch((error) => setError(error.message)));
+    els.deployBtn.addEventListener("click", deploy);
+
+    if (window.ethereum) {
+      window.ethereum.on?.("accountsChanged", (accounts) => {
+        account = accounts[0] || "";
+        updateStatus();
+      });
+      window.ethereum.on?.("chainChanged", (nextChainId) => {
+        chainId = nextChainId;
+        updateStatus();
+      });
+      refreshWalletState().catch(() => updateStatus());
+    } else {
+      updateStatus();
+    }
+  </script>
+</body>
+</html>

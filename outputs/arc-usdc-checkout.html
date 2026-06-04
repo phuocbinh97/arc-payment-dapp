@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arc USDC Checkout</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0757f9;
+      --accent-dark: #0647c9;
+      --ok: #087443;
+      --warn: #b54708;
+      --bad: #b42318;
+      --shadow: 0 18px 50px rgba(23, 32, 51, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(7, 87, 249, 0.08), transparent 42%),
+        var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: white;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 38px);
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .section {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd3df;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      padding: 12px 13px;
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(7, 87, 249, 0.16);
+    }
+
+    input[readonly],
+    textarea[readonly] {
+      background: #f8fafc;
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0 15px;
+      background: var(--accent);
+      color: white;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.secondary {
+      background: white;
+      color: var(--ink);
+      border-color: #cbd3df;
+    }
+
+    button.secondary:hover {
+      background: #f8fafc;
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      border: 1px solid #cbd3df;
+      border-radius: 6px;
+      padding: 0 15px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .link-button:hover {
+      background: #f8fafc;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .merchant-box {
+      display: grid;
+      gap: 4px;
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid #cbd3df;
+      border-radius: 7px;
+      background: #fbfcff;
+    }
+
+    .merchant-box span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .merchant-box strong {
+      font-size: 18px;
+    }
+
+    .advanced summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 800;
+      list-style-position: inside;
+    }
+
+    .advanced .summary {
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 26px;
+      border-radius: 999px;
+      padding: 0 10px;
+      background: #eef4ff;
+      color: #1849a9;
+      font-size: 12px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .summary {
+      display: grid;
+      gap: 12px;
+    }
+
+    .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .line strong {
+      color: var(--ink);
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .amount {
+      margin: 6px 0 2px;
+      font-size: clamp(34px, 5vw, 54px);
+      font-weight: 850;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .amount span {
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 750;
+    }
+
+    .notice {
+      margin-top: 16px;
+      border-left: 4px solid var(--warn);
+      background: #fffaeb;
+      color: #7a2e0e;
+      padding: 12px 13px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .receipt {
+      display: none;
+      margin-top: 16px;
+      border: 1px solid #abefc6;
+      background: #ecfdf3;
+      color: var(--ok);
+      border-radius: 7px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .receipt a {
+      color: var(--ok);
+      font-weight: 800;
+    }
+
+    .error {
+      display: none;
+      margin-top: 16px;
+      border: 1px solid #fecdca;
+      background: #fef3f2;
+      color: var(--bad);
+      border-radius: 7px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .admin-only {
+      display: none;
+    }
+
+    body.admin-mode .admin-only {
+      display: block;
+    }
+
+    body.admin-mode .actions .admin-only {
+      display: inline-flex;
+    }
+
+    body.customer-mode .debug-panel {
+      display: none;
+    }
+
+    .step-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .step strong {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .step span:first-child {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: #eef4ff;
+      color: #1849a9;
+      font-weight: 800;
+    }
+
+    @media (max-width: 820px) {
+      main {
+        width: min(100% - 24px, 640px);
+        padding: 20px 0;
+      }
+
+      .topbar,
+      .grid,
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .section {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">A</div>
+        <div>
+          <h1>Arc USDC Checkout</h1>
+      <p class="subtitle">Pay an invoice with USDC on Arc Testnet.</p>
+        </div>
+      </div>
+      <button id="connectBtn" type="button">Connect wallet</button>
+    </header>
+
+    <div class="grid">
+      <form class="panel" id="checkoutForm">
+        <div class="section">
+          <div class="status">
+            <span id="walletStatus">Wallet not connected</span>
+            <span class="pill"><span class="dot"></span>Arc Testnet</span>
+          </div>
+
+          <div class="merchant-box">
+            <span>Merchant</span>
+            <strong>BCTH Arc Checkout</strong>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="amount">Amount</label>
+              <input id="amount" name="amount" inputmode="decimal" autocomplete="off" value="1.00" placeholder="1.00" readonly>
+            </div>
+            <div>
+              <label for="currency">Currency</label>
+              <input id="currency" name="currency" value="USDC" disabled>
+            </div>
+          </div>
+
+          <label for="orderId">Order ID</label>
+          <input id="orderId" name="orderId" autocomplete="off" value="order-1001" placeholder="order-1001" readonly>
+
+          <label for="memo">Order memo</label>
+          <textarea id="memo" name="memo" placeholder="Order #1001, coffee beans, invoice note..." readonly></textarea>
+
+          <div class="actions">
+            <button id="payBtn" type="submit">Pay with USDC</button>
+            <button class="secondary" id="switchBtn" type="button">Switch network</button>
+          </div>
+
+          <div class="receipt" id="receipt"></div>
+          <div class="error" id="errorBox"></div>
+        </div>
+
+        <details class="section advanced admin-only" id="adminPanel">
+          <summary>Advanced details</summary>
+          <label for="recipient">Merchant wallet</label>
+          <input id="recipient" name="recipient" autocomplete="off" placeholder="0x...">
+
+          <label for="checkoutContract">Checkout contract</label>
+          <input id="checkoutContract" name="checkoutContract" autocomplete="off" placeholder="0x... deploy ArcCheckout.sol first">
+
+          <label for="merchantId">Merchant ID</label>
+          <input id="merchantId" name="merchantId" autocomplete="off" value="bcth-store" placeholder="shop-id">
+
+          <div class="summary">
+            <div class="line"><span>Checkout contract</span><strong id="contractInline">Not set</strong></div>
+            <div class="line"><span>RPC</span><strong>https://rpc.testnet.arc.network</strong></div>
+            <div class="line"><span>Chain ID</span><strong>5042002 / 0x4CEF52</strong></div>
+            <div class="line"><span>Explorer</span><strong>testnet.arcscan.app</strong></div>
+            <div class="line"><span>Gas token</span><strong>USDC</strong></div>
+          </div>
+          <div class="actions">
+            <button class="secondary" id="editInvoiceBtn" type="button">Edit invoice</button>
+            <button class="secondary" id="generateInvoiceBtn" type="button">Generate invoice link</button>
+            <a class="link-button" href="./deploy-arc-checkout.html">Deploy contract</a>
+          </div>
+        </details>
+      </form>
+
+      <aside class="panel">
+        <div class="section">
+          <h2>Payment preview</h2>
+          <div class="amount"><span>$</span><output id="amountPreview">1.00</output> <span>USDC</span></div>
+          <p class="small">You will approve USDC first, then confirm the payment through the merchant checkout contract.</p>
+        </div>
+        <div class="section">
+          <h2>How payment works</h2>
+          <div class="step-list">
+            <div class="step"><span>1</span><p><strong>Approve USDC</strong>Allow this checkout to use exactly the invoice amount.</p></div>
+            <div class="step"><span>2</span><p><strong>Confirm payment</strong>Send the payment through the merchant contract on Arc.</p></div>
+            <div class="step"><span>3</span><p><strong>Get receipt</strong>View the confirmed transaction on ArcScan.</p></div>
+          </div>
+          <div class="notice">Use testnet funds only. Get Arc Testnet USDC from the Circle Faucet before paying.</div>
+        </div>
+        <div class="section debug-panel">
+          <h2>Checkout details</h2>
+          <div class="summary">
+            <div class="line"><span>Merchant</span><strong id="recipientPreview">Not set</strong></div>
+            <div class="line"><span>Contract</span><strong id="contractPreview">Not set</strong></div>
+            <div class="line"><span>Order ID</span><strong id="orderPreview">Not set</strong></div>
+            <div class="line"><span>Connected wallet</span><strong id="accountPreview">Not connected</strong></div>
+            <div class="line"><span>Detected chain</span><strong id="chainPreview">Unknown</strong></div>
+            <div class="line"><span>Memo</span><strong id="memoPreview">None</strong></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const ARC_CHAIN_ID_DEC = 5042002;
+    const ARC_CHAIN_ID_HEX = "0x4cef52";
+    const ARC_RPC = "https://rpc.testnet.arc.network";
+    const ARC_EXPLORER = "https://testnet.arcscan.app";
+    const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
+    const DEFAULT_HUB_CONTRACT = "0xc7cb4f5ace70a4febc3b260591832af72563e988";
+    const DEFAULT_CHECKOUT_CONTRACT = DEFAULT_HUB_CONTRACT;
+    const DEFAULT_MERCHANT = "0x5e86fce1b94772ff6a9632fa8bec82ba59e24f02";
+    const params = new URLSearchParams(window.location.search);
+    const isAdminMode = params.get("admin") === "1";
+    document.body.classList.add(isAdminMode ? "admin-mode" : "customer-mode");
+
+    const els = {
+      connectBtn: document.querySelector("#connectBtn"),
+      switchBtn: document.querySelector("#switchBtn"),
+      editInvoiceBtn: document.querySelector("#editInvoiceBtn"),
+      generateInvoiceBtn: document.querySelector("#generateInvoiceBtn"),
+      form: document.querySelector("#checkoutForm"),
+      amount: document.querySelector("#amount"),
+      recipient: document.querySelector("#recipient"),
+      checkoutContract: document.querySelector("#checkoutContract"),
+      merchantId: document.querySelector("#merchantId"),
+      orderId: document.querySelector("#orderId"),
+      memo: document.querySelector("#memo"),
+      payBtn: document.querySelector("#payBtn"),
+      walletStatus: document.querySelector("#walletStatus"),
+      amountPreview: document.querySelector("#amountPreview"),
+      recipientPreview: document.querySelector("#recipientPreview"),
+      contractPreview: document.querySelector("#contractPreview"),
+      contractInline: document.querySelector("#contractInline"),
+      orderPreview: document.querySelector("#orderPreview"),
+      accountPreview: document.querySelector("#accountPreview"),
+      chainPreview: document.querySelector("#chainPreview"),
+      memoPreview: document.querySelector("#memoPreview"),
+      receipt: document.querySelector("#receipt"),
+      errorBox: document.querySelector("#errorBox")
+    };
+
+    let account = "";
+    let chainId = "";
+
+    function shortAddress(address) {
+      return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
+    }
+
+    function setError(message) {
+      els.errorBox.style.display = message ? "block" : "none";
+      els.errorBox.textContent = message || "";
+    }
+
+    function setReceipt(hash) {
+      if (!hash) {
+        els.receipt.style.display = "none";
+        els.receipt.innerHTML = "";
+        return;
+      }
+      els.receipt.style.display = "block";
+      els.receipt.innerHTML = `Payment submitted. <a href="${ARC_EXPLORER}/tx/${hash}" target="_blank" rel="noreferrer">View receipt on ArcScan</a>`;
+    }
+
+    function isValidAddress(address) {
+      return /^0x[a-fA-F0-9]{40}$/.test(address);
+    }
+
+    function parseUsdcErc20(amount) {
+      const cleaned = amount.trim();
+      if (!/^\d+(\.\d{1,6})?$/.test(cleaned)) {
+        throw new Error("Amount must be a positive number with up to 6 decimals.");
+      }
+      const [whole, fraction = ""] = cleaned.split(".");
+      const units = BigInt(whole) * 10n ** 6n + BigInt(fraction.padEnd(6, "0"));
+      if (units <= 0n) {
+        throw new Error("Amount must be greater than zero.");
+      }
+      return units;
+    }
+
+    function encodeApprove(spender, units) {
+      const selector = "095ea7b3";
+      const encodedSpender = spender.toLowerCase().replace("0x", "").padStart(64, "0");
+      const encodedAmount = units.toString(16).padStart(64, "0");
+      return `0x${selector}${encodedSpender}${encodedAmount}`;
+    }
+
+    function utf8ToHex(value) {
+      return Array.from(new TextEncoder().encode(value))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function encodeUint(value) {
+      return BigInt(value).toString(16).padStart(64, "0");
+    }
+
+    function encodeAddress(address) {
+      return address.toLowerCase().replace("0x", "").padStart(64, "0");
+    }
+
+    function encodeDynamicString(value) {
+      const hex = utf8ToHex(value);
+      const byteLength = hex.length / 2;
+      const paddedLength = Math.ceil(hex.length / 64) * 64;
+      return encodeUint(byteLength) + hex.padEnd(paddedLength, "0");
+    }
+
+    function encodeCheckoutPay(orderId, units, memo) {
+      const selector = "a300982f";
+      const headSize = 32n * 3n;
+      const orderData = encodeDynamicString(orderId);
+      const memoData = encodeDynamicString(memo);
+      const orderOffset = headSize;
+      const memoOffset = headSize + BigInt(orderData.length / 2);
+      const head = encodeUint(orderOffset) + encodeUint(units) + encodeUint(memoOffset);
+      return `0x${selector}${head}${orderData}${memoData}`;
+    }
+
+    function encodeHubPay(merchant, merchantId, orderId, units, memo) {
+      const selector = "fdc9fcdf";
+      const headSize = 32n * 5n;
+      const merchantIdData = encodeDynamicString(merchantId);
+      const orderData = encodeDynamicString(orderId);
+      const memoData = encodeDynamicString(memo);
+      const merchantIdOffset = headSize;
+      const orderOffset = merchantIdOffset + BigInt(merchantIdData.length / 2);
+      const memoOffset = orderOffset + BigInt(orderData.length / 2);
+      const head =
+        encodeAddress(merchant) +
+        encodeUint(merchantIdOffset) +
+        encodeUint(orderOffset) +
+        encodeUint(units) +
+        encodeUint(memoOffset);
+      return `0x${selector}${head}${merchantIdData}${orderData}${memoData}`;
+    }
+
+    function updatePreview() {
+      const amount = els.amount.value.trim() || "0";
+      els.amountPreview.textContent = amount;
+      els.recipientPreview.textContent = els.recipient.value.trim() || "Not set";
+      els.contractPreview.textContent = els.checkoutContract.value.trim() || "Not set";
+      els.contractInline.textContent = els.checkoutContract.value.trim() || "Not set";
+      els.orderPreview.textContent = els.orderId.value.trim() || "Not set";
+      els.accountPreview.textContent = account ? shortAddress(account) : "Not connected";
+      els.chainPreview.textContent = chainId ? `${chainId}${chainId.toLowerCase() === ARC_CHAIN_ID_HEX ? " (Arc)" : ""}` : "Unknown";
+      els.memoPreview.textContent = els.memo.value.trim() || "None";
+      els.walletStatus.textContent = account ? `Connected: ${shortAddress(account)}` : "Wallet not connected";
+      els.connectBtn.textContent = account ? `Disconnect ${shortAddress(account)}` : "Connect wallet";
+      els.connectBtn.classList.toggle("secondary", Boolean(account));
+    }
+
+    function loadSavedDeployment() {
+      const savedContract = localStorage.getItem("arcCheckoutHub") || DEFAULT_CHECKOUT_CONTRACT;
+      const savedMerchant = localStorage.getItem("arcCheckoutMerchant") || DEFAULT_MERCHANT;
+      if (savedContract && !els.checkoutContract.value) {
+        els.checkoutContract.value = savedContract;
+      }
+      if (
+        savedMerchant &&
+        (!els.recipient.value || els.recipient.value.toLowerCase() === "0xec594c7de34f3fc730c1e2f29f5f2e64be5d24e9")
+      ) {
+        els.recipient.value = savedMerchant;
+      }
+    }
+
+    function loadInvoiceFromUrl() {
+      const amount = params.get("amount");
+      const order = params.get("order");
+      const memo = params.get("memo");
+      const merchant = params.get("merchant");
+      const contract = params.get("contract");
+      const merchantId = params.get("merchantId");
+      if (amount) els.amount.value = amount;
+      if (order) els.orderId.value = order;
+      if (memo) els.memo.value = memo;
+      if (merchant) els.recipient.value = merchant;
+      if (contract) els.checkoutContract.value = contract;
+      if (merchantId) els.merchantId.value = merchantId;
+    }
+
+    function generateInvoiceLink() {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("admin");
+      url.searchParams.set("amount", els.amount.value.trim() || "1.00");
+      url.searchParams.set("order", els.orderId.value.trim() || `order-${Date.now()}`);
+      url.searchParams.set("memo", els.memo.value.trim() || "Arc checkout invoice");
+      url.searchParams.set("merchant", els.recipient.value.trim());
+      url.searchParams.set("contract", els.checkoutContract.value.trim());
+      url.searchParams.set("merchantId", els.merchantId.value.trim() || "merchant");
+      url.searchParams.set("mode", "hub");
+      navigator.clipboard?.writeText(url.toString());
+      setReceipt(`Invoice link copied. <a href="${url.toString()}">Open invoice</a>`);
+    }
+
+    function enableInvoiceEditing() {
+      if (!isAdminMode) return;
+      els.amount.readOnly = false;
+      els.orderId.readOnly = false;
+      els.memo.readOnly = false;
+      els.amount.focus();
+    }
+
+    function shouldUseHubContract() {
+      const savedHub = localStorage.getItem("arcCheckoutHub");
+      const selectedContract = els.checkoutContract.value.trim().toLowerCase();
+      return params.get("mode") === "hub" ||
+        selectedContract === DEFAULT_HUB_CONTRACT.toLowerCase() ||
+        (savedHub && savedHub.toLowerCase() === selectedContract);
+    }
+
+    async function requireWallet() {
+      if (!window.ethereum) {
+        throw new Error("No injected wallet found. Install MetaMask, Rabby, or another EIP-1193 wallet.");
+      }
+      return window.ethereum;
+    }
+
+    async function refreshWalletState() {
+      const provider = await requireWallet();
+      const accounts = await provider.request({ method: "eth_accounts" });
+      account = accounts[0] || "";
+      chainId = await provider.request({ method: "eth_chainId" });
+      updatePreview();
+    }
+
+    async function connectWallet() {
+      setError("");
+      const provider = await requireWallet();
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      account = accounts[0] || "";
+      chainId = await provider.request({ method: "eth_chainId" });
+      updatePreview();
+    }
+
+    async function disconnectWallet() {
+      setError("");
+      try {
+        const provider = await requireWallet();
+        if (provider.request) {
+          await provider.request({
+            method: "wallet_revokePermissions",
+            params: [{ eth_accounts: {} }]
+          });
+        }
+      } catch (error) {
+        // Some wallets do not support permission revocation from dApps.
+      } finally {
+        account = "";
+        updatePreview();
+      }
+    }
+
+    async function toggleWalletConnection() {
+      if (account) {
+        await disconnectWallet();
+      } else {
+        await connectWallet();
+      }
+    }
+
+    async function switchToArc() {
+      setError("");
+      const provider = await requireWallet();
+      try {
+        await provider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: ARC_CHAIN_ID_HEX }]
+        });
+      } catch (error) {
+        if (error.code !== 4902) {
+          throw error;
+        }
+        await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: ARC_CHAIN_ID_HEX,
+            chainName: "Arc Testnet",
+            nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
+            rpcUrls: [ARC_RPC],
+            blockExplorerUrls: [ARC_EXPLORER]
+          }]
+        });
+      }
+      await refreshWalletState();
+    }
+
+    async function pay(event) {
+      event.preventDefault();
+      setError("");
+      setReceipt("");
+
+      try {
+        const provider = await requireWallet();
+        if (!account) {
+          await connectWallet();
+        }
+        if (chainId.toLowerCase() !== ARC_CHAIN_ID_HEX) {
+          await switchToArc();
+        }
+
+        const to = els.recipient.value.trim();
+        if (!isValidAddress(to)) {
+          throw new Error("Merchant wallet must be a valid EVM address.");
+        }
+        const checkoutContract = els.checkoutContract.value.trim();
+        if (!isValidAddress(checkoutContract)) {
+          throw new Error("Checkout contract must be a valid deployed ArcCheckout address.");
+        }
+        const orderId = els.orderId.value.trim();
+        if (!orderId) {
+          throw new Error("Order ID is required.");
+        }
+
+        const units = parseUsdcErc20(els.amount.value);
+        els.payBtn.disabled = true;
+        els.payBtn.textContent = "Approve USDC";
+
+        await provider.request({
+          method: "eth_sendTransaction",
+          params: [{
+            from: account,
+            to: USDC_ADDRESS,
+            value: "0x0",
+            data: encodeApprove(checkoutContract, units),
+            maxFeePerGas: "0x4a817c800",
+            maxPriorityFeePerGas: "0x0"
+          }]
+        });
+
+        els.payBtn.textContent = "Pay order";
+
+        const txHash = await provider.request({
+          method: "eth_sendTransaction",
+          params: [{
+            from: account,
+            to: checkoutContract,
+            value: "0x0",
+            data: shouldUseHubContract()
+              ? encodeHubPay(to, els.merchantId.value.trim() || "merchant", orderId, units, els.memo.value.trim())
+              : encodeCheckoutPay(orderId, units, els.memo.value.trim()),
+            maxFeePerGas: "0x4a817c800",
+            maxPriorityFeePerGas: "0x0"
+          }]
+        });
+
+        setReceipt(txHash);
+      } catch (error) {
+        setError(error.message || "Payment failed.");
+      } finally {
+        els.payBtn.disabled = false;
+        els.payBtn.textContent = "Pay with USDC";
+      }
+    }
+
+    els.connectBtn.addEventListener("click", () => toggleWalletConnection().catch((error) => setError(error.message)));
+    els.switchBtn.addEventListener("click", () => switchToArc().catch((error) => setError(error.message)));
+    els.editInvoiceBtn.addEventListener("click", enableInvoiceEditing);
+    els.generateInvoiceBtn.addEventListener("click", generateInvoiceLink);
+    els.form.addEventListener("submit", pay);
+    els.amount.addEventListener("input", updatePreview);
+    els.recipient.addEventListener("input", updatePreview);
+    els.checkoutContract.addEventListener("input", updatePreview);
+    els.merchantId.addEventListener("input", updatePreview);
+    els.orderId.addEventListener("input", updatePreview);
+    els.memo.addEventListener("input", updatePreview);
+    loadSavedDeployment();
+    loadInvoiceFromUrl();
+    updatePreview();
+
+    if (window.ethereum) {
+      window.ethereum.on?.("accountsChanged", (accounts) => {
+        account = accounts[0] || "";
+        updatePreview();
+      });
+      window.ethereum.on?.("chainChanged", (nextChainId) => {
+        chainId = nextChainId;
+        updatePreview();
+      });
+      refreshWalletState().catch(() => updatePreview());
+    } else {
+      updatePreview();
+    }
+  </script>
+</body>
+</html>

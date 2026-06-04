@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BCTH Store — Arc Testnet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0757f9;
+      --accent-dark: #0647c9;
+      --ok: #087443;
+      --shadow: 0 18px 50px rgba(23, 32, 51, 0.12);
+
+      /* Shop extras */
+      --tag-bg: #eef4ff;
+      --tag-ink: #1849a9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      width: min(1160px, 100% - 48px);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: var(--ink);
+      color: white;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .logo-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-net {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--tag-bg);
+      color: var(--tag-ink);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-net::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #0757f9;
+    }
+
+    .cart-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0f1f3d 0%, #172033 60%, #1a2a4a 100%);
+      color: white;
+      padding: 64px 0 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(7,87,249,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      width: min(1160px, 100% - 48px);
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(7,87,249,0.25);
+      border: 1px solid rgba(7,87,249,0.4);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #93b4fd;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 5vw, 54px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+    }
+
+    .hero p {
+      color: rgba(255,255,255,0.6);
+      font-size: 16px;
+      max-width: 480px;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      width: min(1160px, 100% - 48px);
+      margin: 0 auto;
+      padding: 40px 0 80px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    /* ── PRODUCT GRID ── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 48px;
+    }
+
+    .product-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(23,32,51,0.06);
+      transition: box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .product-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .product-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+      position: relative;
+    }
+
+    .product-img .stock-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      padding: 3px 8px;
+      background: #ecfdf3;
+      color: var(--ok);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid #abefc6;
+    }
+
+    .product-body {
+      padding: 16px;
+    }
+
+    .product-category {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--tag-ink);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .product-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .product-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .product-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .product-price span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .buy-btn {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 120ms ease;
+      white-space: nowrap;
+    }
+
+    .buy-btn:hover { background: var(--accent-dark); }
+
+    /* ── CUSTOM ORDER ── */
+    .custom-section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 2px 12px rgba(23,32,51,0.06);
+    }
+
+    .custom-section h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .custom-section p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .custom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #344054;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd3df;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(7,87,249,0.14);
+    }
+
+    .checkout-btn {
+      padding: 10px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      height: 42px;
+      transition: background 120ms ease;
+    }
+
+    .checkout-btn:hover { background: var(--accent-dark); }
+
+    /* ── CART MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(23,32,51,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: var(--panel);
+      border-radius: 14px;
+      width: min(480px, 100%);
+      box-shadow: 0 32px 80px rgba(23,32,51,0.2);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-head h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .modal-body {
+      padding: 20px 22px;
+    }
+
+    .order-summary {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .order-row strong {
+      color: var(--ink);
+      text-align: right;
+    }
+
+    .order-row.total {
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-actions .checkout-btn { flex: 1; }
+
+    .cancel-btn {
+      padding: 10px 16px;
+      background: white;
+      color: var(--ink);
+      border: 1px solid #cbd3df;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover { background: #f8fafc; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 20px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+      .custom-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .custom-grid .checkout-btn {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .custom-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">
+      <div class="logo-mark">A</div>
+      <span class="logo-name">BCTH Store</span>
+    </a>
+    <div class="nav-right">
+      <span class="badge-net">Arc Testnet</span>
+      <button class="cart-btn" onclick="openCart()">
+        🛒 Giỏ hàng (<span id="cartCount">0</span>)
+      </button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">⚡ Powered by Arc Testnet · USDC</div>
+    <h1>BCTH Store</h1>
+    <p>Cửa hàng demo trên Arc Testnet. Thanh toán bằng USDC — giao dịch on-chain thực sự.</p>
+  </div>
+</section>
+
+<main class="main">
+  <h2 class="section-title">Sản phẩm nổi bật</h2>
+
+  <div class="product-grid" id="productGrid"></div>
+
+  <div class="custom-section">
+    <h2>Đặt hàng tuỳ chỉnh</h2>
+    <p>Nhập thông tin đơn hàng thủ công — dùng để test thanh toán với bất kỳ amount nào.</p>
+    <div class="custom-grid">
+      <div class="field">
+        <label>Tên sản phẩm</label>
+        <input id="customName" type="text" placeholder="Tên sản phẩm..." value="Custom order">
+      </div>
+      <div class="field">
+        <label>Amount (USDC)</label>
+        <input id="customAmount" type="number" step="0.01" min="0.01" placeholder="0.00" value="1.00">
+      </div>
+      <div class="field">
+        <label>Memo</label>
+        <input id="customMemo" type="text" placeholder="Ghi chú...">
+      </div>
+      <button class="checkout-btn" onclick="customCheckout()">Thanh toán →</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div>BCTH Store · Arc Testnet · Chỉ dùng testnet USDC</div>
+</footer>
+
+<!-- Cart / confirm modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Xác nhận đơn hàng</h3>
+      <button class="close-btn" onclick="closeCart()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="order-summary" id="orderSummary"></div>
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeCart()">Huỷ</button>
+        <button class="checkout-btn" onclick="goCheckout()">Thanh toán bằng USDC →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Config ──────────────────────────────────────────────
+  const CHECKOUT_PAGE   = window.location.protocol === 'file:'
+    ? 'http://127.0.0.1:8765/arc-usdc-checkout.html'
+    : './arc-usdc-checkout.html';
+  const MERCHANT_WALLET = '0x5e86fce1b94772ff6a9632fa8bec82ba59e24f02';
+  const CONTRACT_ADDR   = '0x56d4eae22fdf19b29cbcb2afc1afa414bcb1cb3a';
+  const HUB_CONTRACT    = '0xc7cb4f5ace70a4febc3b260591832af72563e988';
+  const MERCHANT_ID     = 'bcth-store';
+
+  // ── Products ────────────────────────────────────────────
+  const products = [
+    { id: 'p001', emoji: '☕', category: 'Đồ uống', name: 'Cà phê Arabica', desc: 'Hạt cà phê Arabica rang mộc, thơm ngon từ Đà Lạt.', price: 1.00 },
+    { id: 'p002', emoji: '🧋', category: 'Đồ uống', name: 'Trà sữa Matcha', desc: 'Matcha Nhật Bản pha trà sữa béo ngậy, kèm trân châu đường đen.', price: 2.50 },
+    { id: 'p003', emoji: '🍰', category: 'Bánh ngọt', name: 'Bánh mille-feuille', desc: 'Bánh ngàn lớp bơ Pháp, nhân kem custard vani.', price: 3.00 },
+    { id: 'p004', emoji: '🎧', category: 'Kỹ thuật số', name: 'Nhạc không giới hạn', desc: 'Gói nghe nhạc HD 30 ngày, không quảng cáo.', price: 5.00 },
+    { id: 'p005', emoji: '📦', category: 'Dịch vụ', name: 'Giao hàng nhanh', desc: 'Giao hàng trong ngày nội thành, đóng gói cẩn thận.', price: 0.50 },
+    { id: 'p006', emoji: '🌿', category: 'Thực phẩm', name: 'Trà thảo mộc', desc: 'Hỗn hợp thảo mộc thiên nhiên, giúp thư giãn và dễ ngủ.', price: 1.50 },
+  ];
+
+  // ── Render products ──────────────────────────────────────
+  const grid = document.getElementById('productGrid');
+
+  products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <div class="product-img">
+        ${p.emoji}
+        <span class="stock-badge">Còn hàng</span>
+      </div>
+      <div class="product-body">
+        <div class="product-category">${p.category}</div>
+        <div class="product-name">${p.name}</div>
+        <p class="product-desc">${p.desc}</p>
+        <div class="product-footer">
+          <div class="product-price">${p.price.toFixed(2)} <span>USDC</span></div>
+          <button class="buy-btn" onclick='addToCart(${JSON.stringify(p)})'>Mua ngay</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // ── Cart state ───────────────────────────────────────────
+  let pendingOrder = null;
+
+  function updateCartCount() {
+    document.getElementById('cartCount').textContent = pendingOrder ? 1 : 0;
+  }
+
+  function addToCart(product) {
+    const orderId = `${product.id}-${Date.now()}`;
+    pendingOrder = {
+      name: product.name,
+      amount: product.price.toFixed(2),
+      orderId,
+      memo: `${product.name} — BCTH Store`
+    };
+    updateCartCount();
+    showModal(pendingOrder);
+  }
+
+  function customCheckout() {
+    const name   = document.getElementById('customName').value.trim() || 'Custom order';
+    const amount = parseFloat(document.getElementById('customAmount').value) || 1;
+    const memo   = document.getElementById('customMemo').value.trim() || name;
+    const orderId = `custom-${Date.now()}`;
+    pendingOrder = {
+      name,
+      amount: amount.toFixed(2),
+      orderId,
+      memo
+    };
+    updateCartCount();
+    showModal(pendingOrder);
+  }
+
+  // ── Modal ────────────────────────────────────────────────
+  function showModal(order) {
+    const summary = document.getElementById('orderSummary');
+    summary.innerHTML = `
+      <div class="order-row"><span>Sản phẩm</span><strong>${order.name}</strong></div>
+      <div class="order-row"><span>Order ID</span><strong>${order.orderId}</strong></div>
+      <div class="order-row"><span>Memo</span><strong>${order.memo}</strong></div>
+      <div class="order-row"><span>Thanh toán qua</span><strong>Arc USDC Checkout</strong></div>
+      <div class="order-row total"><span>Tổng cộng</span><strong>${order.amount} USDC</strong></div>
+    `;
+    document.getElementById('overlay').classList.add('open');
+  }
+
+  function openCart() {
+    if (pendingOrder) showModal(pendingOrder);
+  }
+
+  function closeCart() {
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+	function goCheckout() {
+	  if (!pendingOrder) return;
+
+	  const url = new URL('http://127.0.0.1:8765/arc-usdc-checkout.html');
+	  url.searchParams.set('amount',     pendingOrder.amount);
+	  url.searchParams.set('order',      pendingOrder.orderId);
+	  url.searchParams.set('memo',       pendingOrder.memo);
+	  url.searchParams.set('merchant',   '0x5e86FCe1b94772Ff6a9632FA8BEc82BA59e24f02');
+	  url.searchParams.set('merchantId', 'bcth-store');
+	  url.searchParams.set('contract',   '0xc7cb4f5ace70a4febc3b260591832af72563e988');
+	  url.searchParams.set('mode',       'hub');
+
+	  window.location.href = url.toString();
+	}
+
+  // Close overlay on backdrop click
+  document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeCart();
+  });
+</script>
+</body>
+</html>

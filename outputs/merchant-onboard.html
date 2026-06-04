@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arc Checkout Merchant Onboarding</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #fff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0757f9;
+      --accent-dark: #0647c9;
+      --ok: #087443;
+      --bad: #b42318;
+      --warn: #b54708;
+      --shadow: 0 18px 50px rgba(23, 32, 51, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, rgba(7, 87, 249, .08), transparent 42%), var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 850;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 40px);
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(340px, .86fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd3df;
+      border-radius: 6px;
+      padding: 12px 13px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 156px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(7, 87, 249, .16);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button,
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0 15px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 750;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button:hover,
+    a.button:hover {
+      background: var(--accent-dark);
+    }
+
+    .secondary {
+      background: #fff;
+      color: var(--ink);
+      border-color: #cbd3df;
+    }
+
+    .secondary:hover {
+      background: #f8fafc;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary {
+      display: grid;
+      gap: 12px;
+    }
+
+    .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .line strong {
+      color: var(--ink);
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .notice {
+      margin-top: 16px;
+      border-left: 4px solid var(--warn);
+      background: #fffaeb;
+      color: #7a2e0e;
+      padding: 12px 13px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .result,
+    .error {
+      display: none;
+      margin-top: 16px;
+      border-radius: 7px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .result {
+      border: 1px solid #abefc6;
+      background: #ecfdf3;
+      color: var(--ok);
+    }
+
+    .error {
+      border: 1px solid #fecdca;
+      background: #fef3f2;
+      color: var(--bad);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 860px) {
+      main { width: min(100% - 24px, 640px); padding: 20px 0; }
+      header,
+      .grid,
+      .row {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand">
+        <div class="mark">A</div>
+        <div>
+          <h1>Merchant Onboarding</h1>
+          <p class="subtitle">Create a checkout link template for any shop using the Arc Checkout Hub.</p>
+        </div>
+      </div>
+      <button id="connectBtn" type="button">Connect wallet</button>
+    </header>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="status">
+          <span id="walletStatus">Wallet not connected</span>
+          <span>Arc Testnet</span>
+        </div>
+
+        <label for="shopName">Shop name</label>
+        <input id="shopName" value="BCTH Store" placeholder="Shop name">
+
+        <div class="row">
+          <div>
+            <label for="merchantId">Merchant ID</label>
+            <input id="merchantId" value="bcth-store" placeholder="shop-id">
+          </div>
+          <div>
+            <label for="defaultAmount">Default amount</label>
+            <input id="defaultAmount" inputmode="decimal" value="3.00" placeholder="3.00">
+          </div>
+        </div>
+
+        <label for="merchantWallet">Merchant receiving wallet</label>
+        <input id="merchantWallet" placeholder="0x...">
+
+        <div class="row">
+          <div>
+            <label for="orderPrefix">Order prefix</label>
+            <input id="orderPrefix" value="shop-order" placeholder="shop-order">
+          </div>
+          <div>
+            <label for="memo">Default memo</label>
+            <input id="memo" value="Payment via Arc Checkout Hub" placeholder="Memo shown on checkout">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="useWalletBtn" type="button">Use connected wallet</button>
+          <button class="secondary" id="generateBtn" type="button">Generate integration</button>
+          <a class="button secondary" href="./deploy-arc-checkout-hub.html">Deploy hub</a>
+        </div>
+
+        <details style="margin-top: 18px; display: none;">
+          <summary style="cursor: pointer; font-weight: 800;">Platform config</summary>
+          <label for="hubContract">Arc Checkout Hub contract</label>
+          <input id="hubContract" placeholder="Configured by checkout platform owner">
+          <p class="small">Shop owners normally do not edit this. It is the shared hub contract deployed by the checkout platform owner.</p>
+        </details>
+
+        <div class="result" id="result"></div>
+        <div class="error" id="error"></div>
+      </section>
+
+      <aside class="panel">
+        <h2>Merchant Profile</h2>
+        <div class="summary">
+          <div class="line"><span>Shop</span><strong id="shopPreview">BCTH Store</strong></div>
+          <div class="line"><span>Merchant ID</span><strong id="merchantIdPreview">bcth-store</strong></div>
+          <div class="line"><span>Wallet</span><strong id="walletPreview">Not set</strong></div>
+          <div class="line"><span>Hub</span><strong id="hubPreview">Not set</strong></div>
+        </div>
+        <div class="notice">Each merchant keeps their own receiving wallet. The shared hub only routes payments and emits indexed events.</div>
+
+        <label for="checkoutLink">Checkout link example</label>
+        <textarea id="checkoutLink" readonly></textarea>
+
+        <label for="codeSnippet">Shop integration snippet</label>
+        <textarea id="codeSnippet" readonly></textarea>
+
+        <div class="actions">
+          <button class="secondary" id="copyLinkBtn" type="button">Copy link</button>
+          <button class="secondary" id="copyCodeBtn" type="button">Copy code</button>
+          <a class="button" id="openCheckoutBtn" href="./arc-usdc-checkout.html" target="_blank" rel="noreferrer">Open checkout</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const CHECKOUT_PAGE = window.location.protocol === "file:"
+      ? "http://127.0.0.1:8765/arc-usdc-checkout.html"
+      : new URL("./arc-usdc-checkout.html", window.location.href).toString();
+
+    const DEFAULT_HUB_CONTRACT = "0xc7cb4f5ace70a4febc3b260591832af72563e988";
+    const DEFAULT_HUB = localStorage.getItem("arcCheckoutHub") || DEFAULT_HUB_CONTRACT;
+    const els = {
+      connectBtn: document.querySelector("#connectBtn"),
+      useWalletBtn: document.querySelector("#useWalletBtn"),
+      generateBtn: document.querySelector("#generateBtn"),
+      copyLinkBtn: document.querySelector("#copyLinkBtn"),
+      copyCodeBtn: document.querySelector("#copyCodeBtn"),
+      openCheckoutBtn: document.querySelector("#openCheckoutBtn"),
+      walletStatus: document.querySelector("#walletStatus"),
+      shopName: document.querySelector("#shopName"),
+      merchantId: document.querySelector("#merchantId"),
+      merchantWallet: document.querySelector("#merchantWallet"),
+      hubContract: document.querySelector("#hubContract"),
+      defaultAmount: document.querySelector("#defaultAmount"),
+      orderPrefix: document.querySelector("#orderPrefix"),
+      memo: document.querySelector("#memo"),
+      shopPreview: document.querySelector("#shopPreview"),
+      merchantIdPreview: document.querySelector("#merchantIdPreview"),
+      walletPreview: document.querySelector("#walletPreview"),
+      hubPreview: document.querySelector("#hubPreview"),
+      checkoutLink: document.querySelector("#checkoutLink"),
+      codeSnippet: document.querySelector("#codeSnippet"),
+      result: document.querySelector("#result"),
+      error: document.querySelector("#error")
+    };
+
+    let account = "";
+
+    function shortAddress(address) {
+      return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
+    }
+
+    function isValidAddress(address) {
+      return /^0x[a-fA-F0-9]{40}$/.test(address);
+    }
+
+    function slugify(value) {
+      return value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        || "merchant";
+    }
+
+    function setError(message) {
+      els.error.style.display = message ? "block" : "none";
+      els.error.textContent = message || "";
+    }
+
+    function setResult(message) {
+      els.result.style.display = message ? "block" : "none";
+      els.result.textContent = message || "";
+    }
+
+    function requireWallet() {
+      if (!window.ethereum) {
+        throw new Error("Open this page in Chrome with MetaMask or Rabby enabled.");
+      }
+      return window.ethereum;
+    }
+
+    function updateWalletUi() {
+      els.walletStatus.textContent = account ? `Connected: ${shortAddress(account)}` : "Wallet not connected";
+      els.connectBtn.textContent = account ? `Disconnect ${shortAddress(account)}` : "Connect wallet";
+      els.connectBtn.classList.toggle("secondary", Boolean(account));
+    }
+
+    async function refreshWalletState() {
+      const provider = requireWallet();
+      const accounts = await provider.request({ method: "eth_accounts" });
+      account = accounts[0] || "";
+      updateWalletUi();
+    }
+
+    async function connectWallet() {
+      setError("");
+      const provider = requireWallet();
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      account = accounts[0] || "";
+      if (account && !els.merchantWallet.value) {
+        els.merchantWallet.value = account;
+      }
+      updateWalletUi();
+      updateOutputs();
+    }
+
+    async function disconnectWallet() {
+      setError("");
+      try {
+        const provider = requireWallet();
+        await provider.request({
+          method: "wallet_revokePermissions",
+          params: [{ eth_accounts: {} }]
+        });
+      } catch (error) {
+        // Some wallets do not support revocation from dApps.
+      } finally {
+        account = "";
+        updateWalletUi();
+      }
+    }
+
+    async function toggleWalletConnection() {
+      if (account) {
+        await disconnectWallet();
+      } else {
+        await connectWallet();
+      }
+    }
+
+    function buildCheckoutUrl() {
+      const amount = els.defaultAmount.value.trim() || "1.00";
+      const order = `${els.orderPrefix.value.trim() || "order"}-${Date.now()}`;
+      const memo = els.memo.value.trim() || `${els.shopName.value.trim()} order`;
+      const merchant = els.merchantWallet.value.trim();
+      const merchantId = slugify(els.merchantId.value || els.shopName.value);
+      const contract = els.hubContract.value.trim();
+
+      const url = new URL(CHECKOUT_PAGE);
+      url.searchParams.set("amount", amount);
+      url.searchParams.set("order", order);
+      url.searchParams.set("memo", memo);
+      url.searchParams.set("merchant", merchant);
+      url.searchParams.set("merchantId", merchantId);
+      url.searchParams.set("contract", contract);
+      url.searchParams.set("mode", "hub");
+      return url;
+    }
+
+    function buildCodeSnippet() {
+      const merchant = els.merchantWallet.value.trim() || "0xMerchantWallet";
+      const merchantId = slugify(els.merchantId.value || els.shopName.value);
+      const contract = els.hubContract.value.trim() || "0xArcCheckoutHub";
+      return `const checkoutUrl = new URL("${CHECKOUT_PAGE}");
+
+checkoutUrl.searchParams.set("amount", orderTotalUsdc);
+checkoutUrl.searchParams.set("order", orderId);
+checkoutUrl.searchParams.set("memo", orderMemo);
+checkoutUrl.searchParams.set("merchant", "${merchant}");
+checkoutUrl.searchParams.set("merchantId", "${merchantId}");
+checkoutUrl.searchParams.set("contract", "${contract}");
+checkoutUrl.searchParams.set("mode", "hub");
+
+window.location.href = checkoutUrl.toString();`;
+    }
+
+    function updateOutputs() {
+      if (!els.merchantId.value.trim()) {
+        els.merchantId.value = slugify(els.shopName.value);
+      }
+
+      els.shopPreview.textContent = els.shopName.value.trim() || "Not set";
+      els.merchantIdPreview.textContent = slugify(els.merchantId.value || els.shopName.value);
+      els.walletPreview.textContent = els.merchantWallet.value.trim() || "Not set";
+      els.hubPreview.textContent = els.hubContract.value.trim() || "Not set";
+
+      const checkoutUrl = buildCheckoutUrl();
+      els.checkoutLink.value = checkoutUrl.toString();
+      els.codeSnippet.value = buildCodeSnippet();
+      els.openCheckoutBtn.href = checkoutUrl.toString();
+    }
+
+    function validateMerchant() {
+      if (!isValidAddress(els.merchantWallet.value.trim())) {
+        throw new Error("Merchant wallet must be a valid EVM address.");
+      }
+      if (!isValidAddress(els.hubContract.value.trim())) {
+        throw new Error("Hub contract must be a valid EVM address. Deploy the hub first if you do not have one.");
+      }
+      if (!/^\d+(\.\d{1,6})?$/.test(els.defaultAmount.value.trim())) {
+        throw new Error("Default amount must be a positive USDC value with up to 6 decimals.");
+      }
+    }
+
+    function generateIntegration() {
+      setError("");
+      try {
+        validateMerchant();
+        updateOutputs();
+        setResult("Merchant checkout link and integration code generated.");
+      } catch (error) {
+        setError(error.message || "Could not generate integration.");
+      }
+    }
+
+    function useConnectedWallet() {
+      if (!account) {
+        setError("Connect a wallet first.");
+        return;
+      }
+      els.merchantWallet.value = account;
+      updateOutputs();
+    }
+
+    async function copyValue(element, label) {
+      await navigator.clipboard?.writeText(element.value);
+      setResult(`${label} copied.`);
+    }
+
+    els.connectBtn.addEventListener("click", () => toggleWalletConnection().catch((error) => setError(error.message)));
+    els.useWalletBtn.addEventListener("click", useConnectedWallet);
+    els.generateBtn.addEventListener("click", generateIntegration);
+    els.copyLinkBtn.addEventListener("click", () => copyValue(els.checkoutLink, "Checkout link"));
+    els.copyCodeBtn.addEventListener("click", () => copyValue(els.codeSnippet, "Integration code"));
+
+    [
+      els.shopName,
+      els.merchantId,
+      els.merchantWallet,
+      els.hubContract,
+      els.defaultAmount,
+      els.orderPrefix,
+      els.memo
+    ].forEach((input) => input.addEventListener("input", updateOutputs));
+
+    if (DEFAULT_HUB) {
+      els.hubContract.value = DEFAULT_HUB;
+    }
+    updateOutputs();
+
+    if (window.ethereum) {
+      window.ethereum.on?.("accountsChanged", (accounts) => {
+        account = accounts[0] || "";
+        updateWalletUi();
+      });
+      refreshWalletState().catch(() => updateWalletUi());
+    } else {
+      updateWalletUi();
+    }
+  </script>
+</body>
+</html>
