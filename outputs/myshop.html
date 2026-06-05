@@ -670,6 +670,7 @@ function handleCheckout() {
   url.searchParams.set('merchantId', 'moc-shop');
   url.searchParams.set('contract',   '0xc7cb4f5ace70a4febc3b260591832af72563e988');
   url.searchParams.set('mode',       'hub');
+  url.searchParams.set('redirect',   'http://127.0.0.1:8765/myshop.html')
 
   window.location.href = url.toString();
 }
