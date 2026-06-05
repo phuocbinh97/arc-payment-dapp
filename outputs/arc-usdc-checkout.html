@@ -548,6 +548,7 @@
     const DEFAULT_MERCHANT = "0x5e86fce1b94772ff6a9632fa8bec82ba59e24f02";
     const params = new URLSearchParams(window.location.search);
     const isAdminMode = params.get("admin") === "1";
+	const redirectUrl = params.get("redirect") || null;
     document.body.classList.add(isAdminMode ? "admin-mode" : "customer-mode");
 
     const els = {
@@ -589,14 +590,25 @@
     }
 
     function setReceipt(hash) {
-      if (!hash) {
-        els.receipt.style.display = "none";
-        els.receipt.innerHTML = "";
-        return;
-      }
-      els.receipt.style.display = "block";
-      els.receipt.innerHTML = `Payment submitted. <a href="${ARC_EXPLORER}/tx/${hash}" target="_blank" rel="noreferrer">View receipt on ArcScan</a>`;
-    }
+	  if (!hash) {
+		els.receipt.style.display = "none";
+		els.receipt.innerHTML = "";
+		return;
+	  }
+	  els.receipt.style.display = "block";
+	  els.receipt.innerHTML = `Payment submitted. <a href="${ARC_EXPLORER}/tx/${hash}" target="_blank" rel="noreferrer">View receipt on ArcScan</a>`;
+
+	  // Auto redirect to shop's success page if provided
+	  if (redirectUrl) {
+		const successUrl = new URL(redirectUrl);
+		successUrl.searchParams.set("txHash", hash);
+		successUrl.searchParams.set("order", params.get("order") || "");
+		successUrl.searchParams.set("amount", params.get("amount") || "");
+		setTimeout(() => {
+		  window.location.href = successUrl.toString();
+		}, 7000); // wait 2 seconds so customer sees the receipt first
+	  }
+	}
 
     function isValidAddress(address) {
       return /^0x[a-fA-F0-9]{40}$/.test(address);
