@@ -182,15 +182,40 @@
       const slugData = encodeDynamicString(projectSlug);
       return encodeAddress(usdc) + encodeUint(64) + slugData;
     }
+    // Fetch live baseFee — Arc BFT, no priority tip needed. 20% buffer.
+    async function fetchGasPrice() {
+      try {
+        const provider = requireWallet();
+        const block = await provider.request({
+          method: "eth_getBlockByNumber",
+          params: ["latest", false]
+        });
+        const baseFee = BigInt(block.baseFeePerGas || "0x0");
+        const maxFee = baseFee + (baseFee * 20n / 100n) + 1n;
+        return {
+          maxFeePerGas: "0x" + maxFee.toString(16),
+          maxPriorityFeePerGas: "0x0"
+        };
+      } catch {
+        return { maxFeePerGas: "0x4a817c800", maxPriorityFeePerGas: "0x0" };
+      }
+    }
+
+    // Arc finalises in <1s. Poll every 500ms, timeout 30s.
     async function waitForReceipt(txHash) {
       const provider = requireWallet();
-      for (let i = 0; i < 80; i += 1) {
+      const start = Date.now();
+      while (Date.now() - start < 30000) {
         const receipt = await provider.request({ method: "eth_getTransactionReceipt", params: [txHash] });
-        if (receipt) return receipt;
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        if (receipt) {
+          if (receipt.status === "0x0") throw new Error("Deploy transaction reverted on-chain.");
+          return receipt;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
-      throw new Error("Receipt not available yet. Check ArcScan with the tx hash.");
+      throw new Error("Receipt not confirmed after 30s. Check ArcScan with the tx hash.");
     }
+
     async function deploy() {
       setError("");
       setResult("");
@@ -202,22 +227,23 @@
         if (!isValidAddress(usdc)) throw new Error("USDC contract must be a valid address.");
         if (!projectSlug) throw new Error("Project slug is required.");
         els.deployBtn.disabled = true;
-        els.deployBtn.textContent = "Confirm deploy";
+        els.deployBtn.textContent = "Confirm deploy…";
         const provider = requireWallet();
         const artifact = await fetch("./ArcCheckoutHub.artifact.json").then((response) => response.json());
+
+        // Use live gas price — never hardcode on Arc
+        const gas = await fetchGasPrice();
         const txHash = await provider.request({
           method: "eth_sendTransaction",
           params: [{
             from: account,
             data: artifact.bytecode + encodeConstructor(usdc, projectSlug),
-            maxFeePerGas: "0x4a817c800",
-            maxPriorityFeePerGas: "0x0"
+            ...gas
           }]
         });
         setResult(`Deploy submitted. <a href="${ARC_EXPLORER}/tx/${txHash}" target="_blank" rel="noreferrer">View tx</a>`);
-        els.deployBtn.textContent = "Waiting receipt";
+        els.deployBtn.textContent = "Waiting for receipt…";
         const receipt = await waitForReceipt(txHash);
-        if (receipt.status !== "0x1") throw new Error("Deploy reverted.");
         localStorage.setItem("arcCheckoutHub", receipt.contractAddress);
         setResult(`
           Hub deployed: <strong>${receipt.contractAddress}</strong><br>
